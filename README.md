@@ -4,9 +4,9 @@
 
 # Introduction
 
-​		**amlnn-model-playground** Is developed based on the **amlnn toolkit**, by completing the  **model conversion** and **deployment** steps we have crated a ready to go **model zoo** for commonly used models. The demo package provides complete model conversion scripts, as well as a complete workflow for using the **Python API**, **OpenAI API**, and **C API** to perform run the converted model.
+​		**amlnn-model-playground** Has been developed using the **amlnn toolkit**, by completing the  **model conversion** and **deployment** steps, we have created a ready to go **model zoo** for commonly used models. The demo package provides complete model conversion scripts, as well as a complete workflow for **Python API**, **OpenAI API**, and **C API** to run the converted model.
 
-**Objective:** To help users get started and deploy models on the Amlogic NPU platform. The rich algorithm library in the model zoo can guide customers through test, benchmarking, proof of concept and deployment of edge AI based products.
+**Objective:** To help users get started and deploy models on the Amlogic NPU platform. The rich algorithm library in the model zoo can help guide developers through test, benchmarking, proof of concept and deployment of edge AI products.
 
 ## Dependencies
 
@@ -74,3 +74,4 @@
 
 
 ​	
+

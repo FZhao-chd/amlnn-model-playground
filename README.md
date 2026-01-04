@@ -4,7 +4,7 @@
 
 # Introduction
 
-​		**amlnn-model-playground** is developed based on the **amlnn toolkit**, completing **model conversion** and **deployment** to implement a model zoo for mainstream and commonly used algorithms. The demo package provides complete model conversion scripts, as well as a complete workflow for using the **Python API**, **OpenAI API**, and **C API** to perform inference and run the converted model.
+​		**amlnn-model-playground** is developed based on the **amlnn toolkit**, completing **model conversion** and **deployment** to implement a **model zoo** for mainstream and commonly used algorithms. The demo package provides complete model conversion scripts, as well as a complete workflow for using the **Python API**, **OpenAI API**, and **C API** to perform inference and run the converted model.
 
 **Objective:** To help users quickly get started and deploy algorithm models on the Amlogic NPU platform. The rich algorithm library in the model zoo can better guide customers in the deployment of AI products.
 
@@ -12,26 +12,28 @@
 
 ## Dependencies
 
-- ​	
+- The model conversion functionality in **amlnn-model-playground** currently relies on the model conversion tool `adla-toolkit-binary-x.x.x.x` provided by Amlogic, which is already provided to all customers using this project by default. The next version will be publicly released via GitHub Release, with a planned official release in Q1 2026.
+- **Android compilation** depends on the NDK toolchain. Currently, version r25c is recommended. Download link: https://github.com/android/ndk/wiki/Unsupported-Downloads
+- **Linux compilation** toolchain dependency: **gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf**, download link: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads/
 
 # Support List
 
-| Category               | Model_name                                                   | Dtype  | Model Link           | Platform      |
-| ---------------------- | ------------------------------------------------------------ | ------ | -------------------- | ------------- |
-| Classification         | [mobilenet_v2](https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224_quant.tgz) | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Classification         | [resnet50-v2](https://github.com/onnx/models/blob/8e893eb39b131f6d3970be6ebd525327d3df34ea/vision/classification/resnet/model/resnet50-v2-7.onnx) | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Object Detection       | [yolov8](https://github.com/ultralytics/ultralytics)         | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Object Detection       | [yolov11](https://github.com/ultralytics/ultralytics)        | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Object Detection       | [yoloworld](https://github.com/AILab-CVC/YOLO-World)         | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Object Detection       | yoloe                                                        | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Face Key Points        | [retinaface](https://github.com/biubug6/Pytorch_Retinaface)  | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Text Detection         | ppocr-det                                                    | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Pose Estimation        | blazepose_detect                                             | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Pose Estimation        | blazepose_landmark                                           | INT8   | Link to server(TODO) | A311D2/S905X5 |
-| Voiceprint recognition | [ECAPA-TDNN](https://github.com/TaoRuijie/ECAPA-TDNN)        | Hybrid | Link to server(TODO) | A311D2/S905X5 |
-| Speech Recognition     | whisper                                                      | Hybrid | Link to server(TODO) | A311D2/S905X5 |
-| Image-Text Matching    | [clip](https://huggingface.co/openai/clip-vit-base-patch32)  | Hybrid | Link to server(TODO) | A311D2/S905X5 |
-| Chat LLM               | deepseek                                                     | Hybrid | Link to server(TODO) | A311D2/S905X5 |
+| Category               | Model_name                                                   | Dtype  | Platform      |
+| ---------------------- | ------------------------------------------------------------ | ------ | ------------- |
+| Classification         | [mobilenet_v2](https://storage.googleapis.com/download.tensorflow.org/models/tflite_11_05_08/mobilenet_v2_1.0_224_quant.tgz) | INT8   | A311D2/S905X5 |
+| Classification         | [resnet50-v2](https://github.com/onnx/models/blob/8e893eb39b131f6d3970be6ebd525327d3df34ea/vision/classification/resnet/model/resnet50-v2-7.onnx) | INT8   | A311D2/S905X5 |
+| Object Detection       | [yolov8](https://github.com/ultralytics/ultralytics)         | INT8   | A311D2/S905X5 |
+| Object Detection       | [yolov11](https://github.com/ultralytics/ultralytics)        | INT8   | A311D2/S905X5 |
+| Object Detection       | [yoloworld](https://github.com/AILab-CVC/YOLO-World)         | INT8   | A311D2/S905X5 |
+| Object Detection       | yoloe                                                        | INT8   | A311D2/S905X5 |
+| Face Key Points        | [retinaface](https://github.com/biubug6/Pytorch_Retinaface)  | INT8   | A311D2/S905X5 |
+| Text Detection         | ppocr-det                                                    | INT8   | A311D2/S905X5 |
+| Pose Estimation        | blazepose_detect                                             | INT8   | A311D2/S905X5 |
+| Pose Estimation        | blazepose_landmark                                           | INT8   | A311D2/S905X5 |
+| Voiceprint recognition | [ECAPA-TDNN](https://github.com/TaoRuijie/ECAPA-TDNN)        | Hybrid | A311D2/S905X5 |
+| Speech Recognition     | whisper                                                      | Hybrid | A311D2/S905X5 |
+| Image-Text Matching    | [clip](https://huggingface.co/openai/clip-vit-base-patch32)  | Hybrid | A311D2/S905X5 |
+| Chat LLM               | deepseek                                                     | Hybrid | A311D2/S905X5 |
 
 
 
@@ -49,16 +51,16 @@
 | ppocr-det          |              |                  |       |        |        |
 | blazepose_detect   |              |                  |       |        |        |
 | blazepose_landmark |              |                  |       |        |        |
-| ECAPA-TDNN         |              |                  |       |        |        |
 | Whisper            | encoder_tiny_en |  [1, 80, 3000]     | Hybrid  |  0.71 |  0.58  |
 | Whisper            | decoder_tiny_en |  [1, 1500, 384]&[1, 48]   | Hybrid  |  10.35  |  9.22  |
 | Clip               | clip-vit-base-patch32 |  [1, 3, 224, 224]   | Hybrid  |  7.48  |  6.82  |
 
-
+- 性能数据是使用natvie case测试出的模型在NPU上的运行时间，如无特殊说明，不包含前后处理的耗时。
+- \表示暂时不支持。
 
 # Examples Compile
 
-TODO
+​     Each **example** directory contains a **build-android.sh** and build-linux.sh **script**. For compilation steps, refer to **Chapter 4** of the **README.md** file in the corresponding example directory.
 
 
 

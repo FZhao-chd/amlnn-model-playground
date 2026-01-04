@@ -55,8 +55,8 @@
 | Whisper            | decoder_tiny_en |  [1, 1500, 384]&[1, 48]   | Hybrid  |  10.35  |  9.22  |
 | Clip               | clip-vit-base-patch32 |  [1, 3, 224, 224]   | Hybrid  |  7.48  |  6.82  |
 
-- 性能数据是使用natvie case测试出的模型在NPU上的运行时间，如无特殊说明，不包含前后处理的耗时。
-- \表示暂时不支持。
+- The performance data represents the runtime of the model on the NPU, as tested using the native case. Unless otherwise specified, it does not include the time spent on pre- and post-processing.
+- \  means currently supported.
 
 # Examples Compile
 

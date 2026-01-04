@@ -26,7 +26,7 @@
 | Object Detection       | [yolov11](https://github.com/ultralytics/ultralytics)        | INT8   | A311D2/S905X5 |
 | Object Detection       | [yoloworld](https://github.com/AILab-CVC/YOLO-World)         | INT8   | A311D2/S905X5 |
 | Object Detection       | yoloe                                                        | INT8   | A311D2/S905X5 |
-| Face Key Points        | [retinaface]([GitHub - biubug6/Pytorch_Retinaface: Retinaface get 80.99% in widerface hard val using mobilenet0.25](https://github.com/biubug6/Pytorch_Retinaface)) | INT8   | A311D2/S905X5 |
+| Face Key Points        | [retinaface](https://github.com/biubug6/Pytorch_Retinaface)  | INT8   | A311D2/S905X5 |
 | Text Detection         | ppocr-det                                                    | INT8   | A311D2/S905X5 |
 | Pose Estimation        | blazepose_detect                                             | INT8   | A311D2/S905X5 |
 | Pose Estimation        | blazepose_landmark                                           | INT8   | A311D2/S905X5 |
@@ -55,8 +55,8 @@
 | Whisper            | decoder_tiny_en |  [1, 1500, 384]&[1, 48]   | Hybrid  |  10.35  |  9.22  |
 | Clip               | clip-vit-base-patch32 |  [1, 3, 224, 224]   | Hybrid  |  7.48  |  6.82  |
 
-- The performance data represents the runtime of the model on the NPU, as tested using the native case. Unless otherwise specified, it does not include the time spent on pre- and post-processing.
-- \  means currently supported.
+- 性能数据是使用natvie case测试出的模型在NPU上的运行时间，如无特殊说明，不包含前后处理的耗时。
+- \表示暂时不支持。
 
 # Examples 编译
 

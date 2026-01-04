@@ -17,33 +17,35 @@
 #ifndef _AMLNN_YOLOV8_DEMO_POSTPROCESS_H_
 #define _AMLNN_YOLOV8_DEMO_POSTPROCESS_H_
 
-#include <iostream>
-#include <vector>
 #include <opencv2/opencv.hpp>
-#include <unordered_set>
+#include <vector>
+#include <tuple>
+#include <string>
 
-typedef struct {
-    float x1;
-    float y1;
-    float x2;
-    float y2;
-    float score;
-    int class_id;
-} Detection;
+// Detection result structure
+struct Detection {
+    float x1, y1, x2, y2;  // Bounding box coordinates
+    float score;           // Confidence score
+    int class_id;          // Predicted class ID
+};
 
-// Function declarations
-// Function declarations
+// COCO class names (80 classes)
+extern const char* COCO_CLASSES[80];
 
+// Preprocess image with letterbox resizing
 std::tuple<cv::Mat, float, std::tuple<int, int>> preprocess(cv::Mat img, std::tuple<int, int> new_shape);
 
+// Quantize float32 image to int8 for model input
+cv::Mat quantize_input(const cv::Mat& float_img, float scale = 0.003921568859368563f, int8_t zero_point = -128);
+
+// Postprocess YOLOv8 outputs with DFL decoding
 std::vector<Detection> postprocess(std::tuple<float*, std::tuple<int, int, int>, int> out0,
                                    std::tuple<float*, std::tuple<int, int, int>, int> out1,
                                    std::tuple<float*, std::tuple<int, int, int>, int> out2,
                                    std::tuple<cv::Mat, float, std::tuple<int, int>> input_tuple,
-                                   float conf_thresh, float iou_threshold, int num_classes, int reverse);
+                                   float conf_thresh, float iou_threshold);
 
+// Draw detections on image
+cv::Mat draw_detections(cv::Mat image, const std::vector<Detection>& detections);
 
-cv::Mat draw_detections(cv::Mat image, const std::vector<Detection>& detections, 
-                        const std::vector<std::string>& classes);
-
-#endif //_AMLNN_YOLOV8_DEMO_POSTPROCESS_H_
+#endif // _AMLNN_YOLOV8_DEMO_POSTPROCESS_H_

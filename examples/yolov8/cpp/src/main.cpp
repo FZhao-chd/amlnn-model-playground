@@ -14,110 +14,116 @@
  * limitations under the License.
  */
 
-
-
 #include <iostream>
 #include <string>
 #include <vector>
-#include <opencv2/opencv.hpp>
 #include <chrono>
-#include "nn_sdk.h"
-#include "model_loader.h"
+#include <tuple>
+#include <iomanip>
+#include <opencv2/opencv.hpp>
 #include "postprocess.h"
+#include "model_loader.h"
 
-const std::string DEFAULT_OUTPUT_PATH = "result.jpg";
+const std::string DEFAULT_OUTPUT_PATH = "./result.jpg";
 const int MODEL_INPUT_WIDTH = 640;
 const int MODEL_INPUT_HEIGHT = 640;
 const float SCORE_THRESHOLD = 0.25f;
 const float NMS_THRESHOLD = 0.45f;
 
-const std::vector<std::string> CLASS_NAMES = {
-    "person", "bicycle", "car", "motorcycle", "airplane",
-    "bus", "train", "truck", "boat", "traffic light",
-    "fire hydrant", "stop sign", "parking meter", "bench", "bird",
-    "cat", "dog", "horse", "sheep", "cow",
-    "elephant", "bear", "zebra", "giraffe", "backpack",
-    "umbrella", "handbag", "tie", "suitcase", "frisbee",
-    "skis", "snowboard", "sports ball", "kite", "baseball bat",
-    "baseball glove", "skateboard", "surfboard", "tennis racket", "bottle",
-    "wine glass", "cup", "fork", "knife", "spoon",
-    "bowl", "banana", "apple", "sandwich", "orange",
-    "broccoli", "carrot", "hot dog", "pizza", "donut",
-    "cake", "chair", "couch", "potted plant", "bed",
-    "dining table", "toilet", "tv", "laptop", "mouse",
-    "remote", "keyboard", "cell phone", "microwave", "oven",
-    "toaster", "sink", "refrigerator", "book", "clock",
-    "vase", "scissors", "teddy bear", "hair drier", "toothbrush"
-};
-
-
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        printf("Usage: %s <model_path> <image_path> [output_path]\n", argv[0]);
+    std::string model_path;
+    std::string image_path;
+
+    if (argc != 3) {
+        printf("%s <model_path> <image_path>\n", argv[0]);
         return -1;
     }
 
-    std::string model_path = argv[1];
-    std::string image_path = argv[2];
-    std::string output_path = (argc > 3) ? argv[3] : DEFAULT_OUTPUT_PATH;
+    if (argc > 1) model_path = argv[1];
+    if (argc > 2) image_path = argv[2];
 
-    printf("Model: %s\n", model_path.c_str());
-    printf("Image: %s\n", image_path.c_str());
+    std::cout << "YOLOv8 Demo" << std::endl;
+    std::cout << "Model: " << model_path << std::endl;
+    std::cout << "Image: " << image_path << std::endl;
+    std::cout << "Output: " << DEFAULT_OUTPUT_PATH << std::endl;
 
-    // 1. Initialize Network
-    void* ctx = init_network(model_path.c_str());
-    if (!ctx) {
-        fprintf(stderr, "Failed to initialize network\n");
-        return -1;
-    }
-
-    // 2. Load Image
+    // 1. Load Image
     cv::Mat img = cv::imread(image_path);
     if (img.empty()) {
-        fprintf(stderr, "Failed to load image: %s\n", image_path.c_str());
-        uninit_network(ctx);
+        std::cerr << "Failed to load image from " << image_path << std::endl;
+        return -1;
+    }
+
+    // 2. Initialize Network
+    void* context = init_network(model_path.c_str());
+    if (!context) {
+        std::cerr << "Failed to initialize network." << std::endl;
         return -1;
     }
 
     // 3. Preprocess
     auto start_time = std::chrono::high_resolution_clock::now();
-    std::tuple<cv::Mat, float, std::tuple<int, int>> input_tuple = preprocess(img, std::make_tuple(MODEL_INPUT_HEIGHT, MODEL_INPUT_WIDTH));
 
-    // 4. Inference
-    nn_output* outdata = (nn_output*)run_network(ctx, {input_tuple});
+    auto [preprocessed, scale, pad] = preprocess(img, std::make_tuple(MODEL_INPUT_HEIGHT, MODEL_INPUT_WIDTH));
+
+    // Quantize to int8 (model expects quantized input)
+    cv::Mat quantized_img = quantize_input(preprocessed);
+
+    // 4. Set input and run inference
+    nn_input inData;
+    memset(&inData, 0, sizeof(nn_input));
+    inData.input_type = BINARY_RAW_DATA;
+    inData.input = quantized_img.data;
+    inData.input_index = 0;
+    inData.size = quantized_img.total() * quantized_img.elemSize();
+
+    if (aml_module_input_set(context, &inData) != 0) {
+        std::cerr << "Failed to set input." << std::endl;
+        uninit_network(context);
+        return -1;
+    }
+
+    aml_output_config_t outconfig;
+    memset(&outconfig, 0, sizeof(aml_output_config_t));
+    outconfig.typeSize = sizeof(aml_output_config_t);
+    outconfig.format = AML_OUTDATA_FLOAT32;
+
+    nn_output* outdata = (nn_output*)aml_module_output_get(context, outconfig);
     if (!outdata) {
-        fprintf(stderr, "Inference failed\n");
-        uninit_network(ctx);
+        std::cerr << "Failed to run network." << std::endl;
+        uninit_network(context);
         return -1;
     }
 
     // 5. Postprocess
-    float* out0 = (float*)outdata->out[0].buf;
-    float* out1 = (float*)outdata->out[1].buf;
-    float* out2 = (float*)outdata->out[2].buf;
+    float* outbuf0 = (float*)outdata->out[0].buf;
+    float* outbuf1 = (float*)outdata->out[1].buf;
+    float* outbuf2 = (float*)outdata->out[2].buf;
 
-    int num_classes = CLASS_NAMES.size();
-    int channels = num_classes + 64; 
+    const int channels = 144;  // 64 DFL + 80 classes
     
     std::vector<Detection> detections = postprocess(
-        std::make_tuple(out0, std::make_tuple(MODEL_INPUT_HEIGHT / 16, MODEL_INPUT_WIDTH / 16, channels), 16),
-        std::make_tuple(out1, std::make_tuple(MODEL_INPUT_HEIGHT / 8, MODEL_INPUT_WIDTH / 8, channels), 8),
-        std::make_tuple(out2, std::make_tuple(MODEL_INPUT_HEIGHT / 32, MODEL_INPUT_WIDTH / 32, channels), 32),
-        input_tuple, SCORE_THRESHOLD, NMS_THRESHOLD, num_classes, 1
+        std::make_tuple(outbuf0, std::make_tuple(MODEL_INPUT_HEIGHT / 16, MODEL_INPUT_WIDTH / 16, channels), 16),
+        std::make_tuple(outbuf1, std::make_tuple(MODEL_INPUT_HEIGHT / 8, MODEL_INPUT_WIDTH / 8, channels), 8),
+        std::make_tuple(outbuf2, std::make_tuple(MODEL_INPUT_HEIGHT / 32, MODEL_INPUT_WIDTH / 32, channels), 32),
+        std::make_tuple(preprocessed, scale, pad),
+        SCORE_THRESHOLD,
+        NMS_THRESHOLD
     );
 
     auto end_time = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double, std::milli> inference_time = end_time - start_time;
-    printf("Inference + Postprocess time: %.2f ms\n", inference_time.count());
-    printf("Detections: %zu\n", detections.size());
+
+    std::cout << "Inference time: " << inference_time.count() << " ms" << std::endl;
+    std::cout << "Detections: " << detections.size() << std::endl;
 
     // 6. Draw and Save
-    cv::Mat res = draw_detections(img, detections, CLASS_NAMES);
-    cv::imwrite(output_path, res);
-    printf("Saved result to %s\n", output_path.c_str());
+    cv::Mat result_img = draw_detections(img, detections);
+    cv::imwrite(DEFAULT_OUTPUT_PATH, result_img);
+    std::cout << "Result saved to " << DEFAULT_OUTPUT_PATH << std::endl;
 
     // 7. Cleanup
-    uninit_network(ctx);
+    uninit_network(context);
 
     return 0;
 }

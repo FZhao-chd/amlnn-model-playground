@@ -46,7 +46,7 @@
 | yoloworld          | yoloworld    | [1, 3, 480, 640] | INT8  | 19.38  | 19.04  |
 | yoloe              | yoloe        | [1, 3, 288, 512] | INT8 | 53.9 | 37.8 |
 | retinaface         | retinaface   | [1, 3, 320, 320] | INT8  | 341.99 | 305.89 |
-| ppocr-det          |              |                  |       |        |        |
+| ppocr-det          | paddleocrv4-det | [1, 3, 640, 640] | INT8 | 37.66 | 38.85 |
 | blazepose_detect   | blazepose_detection | [1, 3, 224, 224] | INT8 | 476.29 | 461.74 |
 | blazepose_landmark | blazepose_landmark_full | [1, 3, 256, 256] | INT16 | 84.59 | 70.31 |
 | Whisper            | encoder_tiny_en |  [1, 80, 3000]     | Hybrid  |  0.71 |  0.58  |

@@ -4,15 +4,13 @@
 
 # Introduction
 
-​		**amlnn-model-playground** is developed based on the **amlnn toolkit**, completing **model conversion** and **deployment** to implement a **model zoo** for mainstream and commonly used algorithms. The demo package provides complete model conversion scripts, as well as a complete workflow for using the **Python API**, **OpenAI API**, and **C API** to perform inference and run the converted model.
+​		**amlnn-model-playground** Is developed based on the **amlnn toolkit**, by completing the  **model conversion** and **deployment** steps we have crated a ready to go **model zoo** for commonly used models. The demo package provides complete model conversion scripts, as well as a complete workflow for using the **Python API**, **OpenAI API**, and **C API** to perform run the converted model.
 
-**Objective:** To help users quickly get started and deploy algorithm models on the Amlogic NPU platform. The rich algorithm library in the model zoo can better guide customers in the deployment of AI products.
-
-
+**Objective:** To help users get started and deploy models on the Amlogic NPU platform. The rich algorithm library in the model zoo can guide customers through test, benchmarking, proof of concept and deployment of edge AI based products.
 
 ## Dependencies
 
-- The model conversion functionality in **amlnn-model-playground** currently relies on the model conversion tool `adla-toolkit-binary-x.x.x.x` provided by Amlogic, which is already provided to all customers using this project by default. The next version will be publicly released via GitHub Release, with a planned official release in Q1 2026.
+- The model conversion functionality in **amlnn-model-playground** currently relies on the model conversion tool `adla-toolkit-binary-x.x.x.x` provided by Amlogic, please contact your sales representivie for access in the short term. 
 - **Android compilation** depends on the NDK toolchain. Currently, version r25c is recommended. Download link: https://github.com/android/ndk/wiki/Unsupported-Downloads
 - **Linux compilation** toolchain dependency: **gcc-arm-10.3-2021.07-x86_64-arm-none-linux-gnueabihf**, download link: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads/
 
@@ -69,6 +67,7 @@
 | Version | Description   |
 | ------- | ------------- |
 | 1.0.0   | First Version |
+
 
 
 

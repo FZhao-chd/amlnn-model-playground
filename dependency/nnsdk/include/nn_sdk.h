@@ -19,12 +19,15 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /////////////////////////some value define////////////////////////
+#define AML_NN_SDK_VERSION          "2.8.5"
+
 #define MAX_NAME_LENGTH             64
 #define INPUT_MAX_NUM               64
 #define OUTPUT_MAX_NUM              64
@@ -850,60 +853,246 @@ typedef  struct __aml_memory_config_t
 /*=============================================================
                      NNSDK main api
 ==============================================================*/
-void*  aml_module_create(aml_config* config);                   /*==========create aml network module======*/
-int  aml_module_input_set(void* context, nn_input *pInput);      /*==========set network input==============*/
-void*  aml_module_output_get(void* context, aml_output_config_t outconfig); /*=======run and get output====*/
-void*  aml_module_output_get_simple(void* context); /*=======run and get output simply,for custom network====*/
-int  aml_module_destroy(void* context);      /*=====destroy network environment,free the alloced buffer====*/
+/**
+ * @brief Create aml network module
+ * @param config    Module configuration
+ * @return void*    Context handle
+ */
+void* aml_module_create(aml_config* config);
+
+/**
+ * @brief Set network input
+ * @param context   Context handle
+ * @param pInput    Input structure
+ * @return int      Status code
+ */
+int aml_module_input_set(void* context, nn_input *pInput);
+
+/**
+ * @brief Run and get output
+ * @param context   Context handle
+ * @param outconfig Output configuration
+ * @return void*    Output handle or data
+ */
+void* aml_module_output_get(void* context, aml_output_config_t outconfig);
+
+/**
+ * @brief Run and get output simply, for custom network
+ * @param context   Context handle
+ * @return void*    Output handle
+ */
+void* aml_module_output_get_simple(void* context);
+
+/**
+ * @brief Destroy network environment, free the alloced buffer
+ * @param context   Context handle
+ * @return int      Status code
+ */
+int aml_module_destroy(void* context);
 
 /*============================================================
-             some aml sdk util functions
+             NNSDK debug api
 ==============================================================*/
-unsigned char  *aml_util_mallocAlignedBuffer(void* context, int mem_size, aml_memory_config_t* mem_config);   /*======malloc 4k align buffer for dma IO====*/
-void  aml_util_freeAlignedBuffer(void* context, unsigned char *addr);         /*======free buffer alloced by above=========*/
-/*==swap input buffer,the inputId(for multi-number input)is ordered as aml_util_getInputTensorInfo array==*/
-int  aml_util_swapInputBuffer(void *context, void *newBuffer, unsigned int inputId);
-int  aml_util_swapOutputBuffer(void *context, void *newBuffer, unsigned int outputId);
+/**
+ * @brief Set profile type
+ * @param type      Profile type
+ * @param savepath  Path to save profile data
+ * @return int      Status code
+ */
+int aml_util_setProfile(aml_profile_type_t type, const char *savepath);
 
-/*=============    ddk version higher than 6.4.6.2.*.*.*   ===============*/
-int  aml_util_switchInputBuffer(void *context, void *newBuffer, unsigned int inputId);
-int  aml_util_switchOutputBuffer(void *context, void *newBuffer, unsigned int outputId);
-int  aml_util_flushTensorHandle(void *context, aml_flush_type_t type);    /*=========== flush tensor cache memory =======================*/
+/**
+ * @brief Set power policy
+ * @param type      Power policy type
+ * @return int      Status code
+ */
+int aml_util_setPowerPolicy(aml_policy_type_t type);
 
-/*=========== get tensor info from nbg files =======================*/
-tensor_info*  aml_util_getInputTensorInfo(const char* nbgdata);  /*====get model input tensor information list=====*/
-tensor_info*  aml_util_getOutputTensorInfo(const char* nbgdata); /*====get model output tensor information list====*/
+/**
+ * @brief Get hardware info
+ * @param customID    Pointer to custom ID
+ * @param powerStatus Pointer to power status
+ * @param version     Pointer to version
+ * @return int        Status code
+ */
+int aml_util_getHardwareStatus(int* customID, int *powerStatus, int* version);
 
+/**
+ * @brief Set auto suspend timeout
+ * @param timeout   Timeout in milliseconds
+ * @return int      Status code
+ */
+int aml_util_setAutoSuspend(int timeout);
 
-int  aml_util_mallocBuffer(void* context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
-int  aml_util_freeBuffer(void* context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
-int  aml_util_flushBuffer(void* context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+/**
+ * @brief Enable profiling
+ * @param context       Context handle
+ * @param profile_data  Pointer to profile configuration
+ * @return int          Status code
+ */
+int aml_util_enableProfile(void *context, aml_profile_config_t* profile_data);
 
-int  aml_util_swapExternalInputBuffer(void *context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
-int  aml_util_swapExternalOutputBuffer(void *context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+/**
+ * @brief Get profile info
+ * @param context       Context handle
+ * @param profile_data  Pointer to profile configuration
+ * @return int          Status code
+ */
+int aml_util_getProfileInfo(void *context, aml_profile_config_t* profile_data);
 
-int  aml_util_getTensorInfo(void *context, const char* model_data, tensor_info** in_tInfo, tensor_info** out_tInfo);
-int  aml_util_freeTensorInfo(tensor_info* tinfo);     /*====free the tensor_info memory get by above two functions*/
+/**
+ * @brief Disable profiling
+ * @param context       Context handle
+ * @param profile_data  Pointer to profile configuration
+ * @return int          Status code
+ */
+int aml_util_disableProfile(void *context, aml_profile_config_t* profile_data);
 
-/*=========== get hardinfo from drivers and set profile =======================*/
-int  aml_util_setProfile(aml_profile_type_t type, const char *savepath); /*===set profile type===*/
-int  aml_util_setPowerPolicy(aml_policy_type_t type); /*===set power policy===*/
-int  aml_util_getHardwareStatus(int* customID, int *powerStatus, int* version); /*===get hardware info===*/
-int  aml_util_setAutoSuspend(int timeout);  /*===get hardware info===*/
+/**
+ * @brief Read chip info
+ * @param platform_info Pointer to platform info structure
+ * @return int          Status code
+ */
+int aml_read_chip_info(aml_platform_info_t* platform_info);
 
+/*============================================================
+             NNSDK dma api
+==============================================================*/
+/**
+ * @brief Malloc 4k align buffer for dma IO
+ * @param context    Context handle
+ * @param mem_size   Size of memory
+ * @param mem_config Memory configuration
+ * @return unsigned char* Pointer to allocated buffer
+ */
+unsigned char *aml_util_mallocAlignedBuffer(void* context, int mem_size, aml_memory_config_t* mem_config);
 
-int  aml_util_enableProfile(void *context, aml_profile_config_t* profile_data);
-int  aml_util_getProfileInfo(void *context, aml_profile_config_t* profile_data);
-int  aml_util_disableProfile(void *context, aml_profile_config_t* profile_data);
+/**
+ * @brief Free buffer alloced by aml_util_mallocAlignedBuffer
+ * @param context    Context handle
+ * @param addr       Address to free
+ */
+void aml_util_freeAlignedBuffer(void* context, unsigned char *addr);
 
-int  aml_read_chip_info(aml_platform_info_t* platform_info);
+/**
+ * @brief Swap input buffer. The inputId (for multi-number input) is ordered as aml_util_getInputTensorInfo array
+ * @param context    Context handle
+ * @param newBuffer  Pointer to new buffer
+ * @param inputId    Index of input
+ * @return int       Status code
+ */
+int aml_util_swapInputBuffer(void *context, void *newBuffer, unsigned int inputId);
 
-/*=========== support kvcache =======================*/
-int aml_util_setKvcacheopt(void *context, aml_kvcache_opt_t* info, int32_t info_size);
-int aml_util_updateKvcacheinfo(void *context, aml_kvcache_dynamic_val_t* info);
-int aml_util_resetTransformer(void *context);
-int aml_util_breakTransformer(void *context);
-int aml_util_getTransformerModelInfo(void *context, aml_transformer_model_info* info);
+/**
+ * @brief Swap output buffer
+ * @param context    Context handle
+ * @param newBuffer  Pointer to new buffer
+ * @param outputId   Index of output
+ * @return int       Status code
+ */
+int aml_util_swapOutputBuffer(void *context, void *newBuffer, unsigned int outputId);
+
+/**
+ * @brief Switch input buffer
+ * @param context    Context handle
+ * @param newBuffer  Pointer to new buffer
+ * @param inputId    Index of input
+ * @return int       Status code
+ */
+int aml_util_switchInputBuffer(void *context, void *newBuffer, unsigned int inputId);
+
+/**
+ * @brief Switch output buffer
+ * @param context    Context handle
+ * @param newBuffer  Pointer to new buffer
+ * @param outputId   Index of output
+ * @return int       Status code
+ */
+int aml_util_switchOutputBuffer(void *context, void *newBuffer, unsigned int outputId);
+
+/**
+ * @brief Flush tensor cache memory
+ * @param context    Context handle
+ * @param type       Flush type
+ * @return int       Status code
+ */
+int aml_util_flushTensorHandle(void *context, aml_flush_type_t type);
+
+/**
+ * @brief Get model input tensor information list
+ * @param nbgdata    Pointer to nbg data
+ * @return tensor_info* Pointer to tensor info structure
+ */
+tensor_info* aml_util_getInputTensorInfo(const char* nbgdata);
+
+/**
+ * @brief Get model output tensor information list
+ * @param nbgdata    Pointer to nbg data
+ * @return tensor_info* Pointer to tensor info structure
+ */
+tensor_info* aml_util_getOutputTensorInfo(const char* nbgdata);
+
+/**
+ * @brief Malloc buffer
+ * @param context    Context handle
+ * @param mem_config Memory configuration
+ * @param mem_data   Memory data structure to fill
+ * @return int       Status code
+ */
+int aml_util_mallocBuffer(void* context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+
+/**
+ * @brief Free buffer
+ * @param context    Context handle
+ * @param mem_config Memory configuration
+ * @param mem_data   Memory data structure
+ * @return int       Status code
+ */
+int aml_util_freeBuffer(void* context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+
+/**
+ * @brief Flush buffer
+ * @param context    Context handle
+ * @param mem_config Memory configuration
+ * @param mem_data   Memory data structure
+ * @return int       Status code
+ */
+int aml_util_flushBuffer(void* context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+
+/**
+ * @brief Swap external input buffer
+ * @param context    Context handle
+ * @param mem_config Memory configuration
+ * @param mem_data   Memory data structure
+ * @return int       Status code
+ */
+int aml_util_swapExternalInputBuffer(void *context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+
+/**
+ * @brief Swap external output buffer
+ * @param context    Context handle
+ * @param mem_config Memory configuration
+ * @param mem_data   Memory data structure
+ * @return int       Status code
+ */
+int aml_util_swapExternalOutputBuffer(void *context, aml_memory_config_t* mem_config, aml_memory_data_t* mem_data);
+
+/**
+ * @brief Get tensor info
+ * @param context    Context handle
+ * @param model_data Model data
+ * @param in_tInfo   Pointer to input tensor info pointer
+ * @param out_tInfo  Pointer to output tensor info pointer
+ * @return int       Status code
+ */
+int aml_util_getTensorInfo(void *context, const char* model_data, tensor_info** in_tInfo, tensor_info** out_tInfo);
+
+/**
+ * @brief Free the tensor_info memory
+ * @param tinfo      Pointer to tensor_info
+ * @return int       Status code
+ */
+int aml_util_freeTensorInfo(tensor_info* tinfo);
 
 #ifdef __cplusplus
 } //extern "C"

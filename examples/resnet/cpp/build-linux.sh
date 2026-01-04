@@ -39,9 +39,7 @@ if ! command -v ${CC} &> /dev/null; then
     echo "Error: Compiler ${CC} not found."
     echo "Please set GCC_COMPILER environment variable to your cross-compiler path prefix."
     echo "Example: export GCC_COMPILER=/path/to/toolchain/bin/aarch64-linux-gnu"
-    # Proceeding anyway as user might have custom env setup
-else
-    echo "Using compiler: ${CC}"
+    exit 1
 fi
 
 ROOT_PWD=$(cd "$(dirname $0)" && pwd)
@@ -58,8 +56,8 @@ cd ${BUILD_DIR}
 cmake ../../src \
     -DCMAKE_SYSTEM_NAME=Linux \
     -DCMAKE_SYSTEM_PROCESSOR=${TARGET_ARCH} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DOpenCV_DIR=${ROOT_PWD}/../../../dependency/opencv/opencv-linux-aarch64/share/OpenCV
+    -DCMAKE_BUILD_TYPE=Release
+
 make -j4
 
-echo "Build complete. Executable in ${BUILD_DIR}/yolo11_demo"
+echo "Build complete. Executable in ${BUILD_DIR}/resnet_demo"

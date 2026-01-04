@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(yolo11_demo) 
+project(resnet_demo) 
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -29,13 +29,13 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 
-add_executable(yolo11_demo
+add_executable(resnet_demo
     main.cpp
     postprocess.cpp
     ${CMAKE_SOURCE_DIR}/../../../../common/model_loader.cpp 
 )
 
-target_link_libraries(yolo11_demo
+target_link_libraries(resnet_demo
     ${OpenCV_LIBS}
     nnsdk
 )
